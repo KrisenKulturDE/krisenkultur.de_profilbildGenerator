@@ -1,17 +1,23 @@
 let config;
+let layers;
 
-addEventListener('load', function() {  
-	const request = new Request('config/config.json');
-  
-  fetch(request)
-		.then(response => {
-			if(response.status == 200) {
-				return response.json();
-      } else {
-				throw new Error("Could not fetch config from server!");
-      }
-    }).then(json => {
-      config = json;
+function getConfig() {
+  return fetch('config/config.json')
+    .then(response => response.json())
+}
+
+function getLayers() {
+  return fetch('config/layers.json')
+    .then(response => response.json())
+}
+
+addEventListener('load', function() {
+  Promise.all([getConfig(), getLayers()])
+    .then(([jsonConfig, jsonLayers]) => {
+      config = jsonConfig;
+      layers = jsonLayers;
+      return 1
+    }).then(value => {
       generateElements();
     }).catch(error => {
       console.log(error);
@@ -19,90 +25,48 @@ addEventListener('load', function() {
 });
 
 function generateElements() {
-	// Create DOM structure
-	var mainElement = document.getElementById(config.rootElementId);
-	mainElement.innerHTML = "";
+  // Create DOM structure
+  console.log(config);
+  var mainElement = document.getElementById(config.rootElementId);
+  mainElement.innerHTML = "";
 	
-	let statusElement = document.createElement('p');
-	statusElement.textContent = config.messages.status.startup;
-	mainElement.appendChild(statusElement);
+  let statusElement = document.createElement('p');
+  statusElement.textContent = config.messages.status.startup;
+  mainElement.appendChild(statusElement);
 
-	let fileUploadElement = document.createElement('input');
-	fileUploadElement.type = 'file';
-	mainElement.appendChild(fileUploadElement);
+  let fileUploadElement = document.createElement('input');
+  fileUploadElement.type = 'file';
+  mainElement.appendChild(fileUploadElement);
+  
+  // create generator to make time to load the images
+  const generator = new Generator(mainElement);
+  generator.fromLayers(layers.layers);
 	
-	let overlayImageElement = new Image();
-	overlayImageElement.src = config.overlaySource;
-	overlayImageElement.style.display = 'none';
-	mainElement.appendChild(overlayImageElement);
-	
-	let logoImageElements = [];
-	
-	config.logoSources.forEach(logo => {
-		let element = new Image();
-		element.src = logo;
-		element.style.display = 'none';
-		mainElement.appendChild(element);
-		logoImageElements.push(element);
-	});
-	
-	fileUploadElement.addEventListener('change', function() {
-		if(this.files && this.files[0]) {
-			statusElement.textContent = config.messages.uploading;
+  fileUploadElement.addEventListener('change', function() {
+    if(this.files && this.files[0]) {
+      statusElement.textContent = config.messages.uploading;
 			
-		  let uploadedImage = document.createElement('img');
-		  uploadedImage.src = URL.createObjectURL(this.files[0]);
+      let uploadedImage = document.createElement('img');
+      uploadedImage.src = URL.createObjectURL(this.files[0]);
 			
-		  uploadedImage.addEventListener('load', function() {
-				statusElement.textContent = config.messages.status.processing;
-				// create generator
-				setupOptions = {
-					width: overlayImageElement.width,
-					height: overlayImageElement.height
-				}
-				const generator = new Generator(setupOptions);
+      uploadedImage.addEventListener('load', function() {
+	statusElement.textContent = config.messages.status.processing;
+	
+	generator.addUserSelectedImage(uploadedImage.src);
 				
-				// calculate scaling of profile image
-				scale_width = setupOptions.width / uploadedImage.width;
-				scale_height = setupOptions.height / uploadedImage.height;
-      	
-				scale = Math.min(scale_width, scale_height);
-    
-				renderOptions = {
-					offset: {
-						top: (setupOptions.height - (uploadedImage.height * scale)) / 2,
-						left: (setupOptions.width - (uploadedImage.width * scale)) / 2
-					},
-					scale: scale
-				};
-				generator.addLayer(uploadedImage, renderOptions);
-				generator.addLayer(overlayImageElement, {});
+	blob = generator.render();
 				
-				// add logos
-				let nextX = 70;
-				logoImageElements.forEach(logo => {
-					renderOptions = {
-						offset: {
-							top: setupOptions.height - 100,
-							left: nextX
-						},
-						scale: 0.1
-					};
-				generator.addLayer(logo, renderOptions);
-				nextX += (logo.width * renderOptions.scale) + 10
-				})
-				
-				// set image url to blob
+	// set image url to blob
         let downloadImageElement = document.createElement('img');
-      	downloadImageElement.src = generator.render();
+      	downloadImageElement.src = blob;
         mainElement.appendChild(downloadImageElement);
 
       	statusElement.textContent = config.messages.status.done;
 
-				// create downloadlink
+	// create downloadlink
         let downloadButtonElement = document.createElement('a');
         downloadButtonElement.innerText = config.messages.buttons.download;
-        downloadButtonElement.href = generator.render();
+        downloadButtonElement.href = blob;
         downloadButtonElement.download = config.profilePictureName;
         mainElement.appendChild(downloadButtonElement);
         
@@ -115,7 +79,7 @@ function generateElements() {
           generateElements();
         });
         mainElement.appendChild(renewFormElement);
-			});
+      });
     }
-	});
+  });
 }

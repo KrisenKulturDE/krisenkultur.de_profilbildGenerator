@@ -1,0 +1,115 @@
+{
+	"layers": [
+		{
+			"color": "#ffffff",
+			"size": {
+				"width": 1000,
+				"height": 1000
+			},
+			"offset": {
+				"top": 0,
+				"left": 0
+			}
+		},
+		{
+			"src": "user-select",
+			"scale": {
+				"fixed": false
+			},
+			"size": {
+				"width": 613,
+				"height": 717
+			},
+			"offset": {
+				"top": 141,
+				"left": 193
+			}
+		},
+		{
+			"color": "#ffffff",
+			"size": {
+				"width": 1000,
+				"height": 250
+			},
+			"offset": {
+				"top": 750
+			}
+		},
+		{
+			"src": "assets/img/rahmen/tuerkis.png",
+			"scale": {
+				"fixed": true
+			},
+			"offset": {
+				"top": 141,
+				"left": 193
+			}
+		},
+		{
+			"text": {
+				"content": "Hallo, Welt!",
+				"font": "30px sans-serif",
+				"color": "#000000"
+			},
+			"offset": {
+				"top": 760,
+				"left": 260
+			}
+		},
+		{
+			"src": "assets/img/logos/gemeinschaft-online.png",
+			"scale": {
+				"fixed": true,
+				"factor": 0.1
+			},
+			"offset": {
+				"top": 770,
+				"left": 260
+			}
+		},
+		{
+			"src": "assets/img/logos/gegen-das-virus.png",
+			"scale": {
+				"fixed": true,
+				"factor": 0.1
+			},
+			"offset": {
+				"top": 770,
+				"left": 370
+			}
+		},
+		{
+			"src": "assets/img/logos/krisen-kultur.png",
+			"scale": {
+				"fixed": true,
+				"factor": 0.1
+			},
+			"offset": {
+				"top": 770,
+				"left": 460
+			}
+		},
+		{
+			"src": "assets/img/logos/corona-jobs.png",
+			"scale": {
+				"fixed": true,
+				"factor": 0.1
+			},
+			"offset": {
+				"top": 770,
+				"left": 590
+			}
+		},
+		{
+			"src": "assets/img/logos/ich-lerne-online.png",
+			"scale": {
+				"fixed": true,
+				"factor": 0.1
+			},
+			"offset": {
+				"top": 770,
+				"left": 660
+			}
+		}
+	]
+}
